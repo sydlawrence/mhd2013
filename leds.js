@@ -135,15 +135,15 @@ board.on("ready", function() {
   var baubles = [
     new Bauble('A0', 47),
     new Bauble('A1', 48),
-    new Bauble('A2', 49),
+    // new Bauble('A2', 49),
     new Bauble('A3', 50),
     new Bauble('A4', 51),
     new Bauble('A5', 52),
     new Bauble('A6', 53),
     new Bauble('A7', 54),
-    new Bauble('A8', 55),
-    new Bauble('A9', 56),
-    new Bauble('A10', 57)
+    // new Bauble('A8', 55),
+    // new Bauble('A9', 56),
+    // new Bauble('A10', 57)
   ];
 
   board.repl.inject({
