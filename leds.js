@@ -3,6 +3,7 @@ var five = require("johnny-five"),
 
     board, button, leds, input;
 
+var output;
 
 var ledMax = 10;
 
@@ -11,18 +12,16 @@ var mentalMode = false;
 var motor;
 
 var sendNote = function(message, deltaTime) {
-  console.log("sending "+message);
+  output.sendMessage(message);
 }
 
 var goMental = function() {
   mentalMode = false;
-  motor.start();
   sendNote([ 144, 84, 100 ]);
 }
 
 var noMental = function() {
   mentalMode = false;
-  motor.stop();
 }
 
 var LedStrip = function(pin) {
@@ -51,10 +50,20 @@ var delay = function(duration, cb, args) {
 
 board.on("ready", function() {
 
+  toggleSwitch = new five.Switch(40);
+  toggleSwitch.on("close", function() {
+    goMental();
+  });
+
+  // "open" the switch is opened
+  toggleSwitch.on("open", function() {
+  });
+
   var ping = new five.Ping(3);
 
-  motor = new five.Led(11);
 
+  output = new midi.output();
+  output.openVirtualPort("TechnoTree");
 
   input = new midi.input();
   input.on('message', function(deltaTime, message) {
@@ -83,10 +92,10 @@ board.on("ready", function() {
   // // Inject the `servo` hardware into
   // // the Repl instance's context;
   // // allows direct command line access
-  fadeLedIn(0);
-  delay(1000,fadeLedIn,1);
-  delay(2000,fadeLedIn,2);
-  delay(3000,fadeLedIn,3);
+  // fadeLedIn(0);
+  // delay(1000,fadeLedIn,1);
+  // delay(2000,fadeLedIn,2);
+  // delay(3000,fadeLedIn,3);
 
 
   var standardPing = 8000;
@@ -107,7 +116,6 @@ board.on("ready", function() {
     fadeLedIn:fadeLedIn,
     ledMax: ledMax,
     fadeLedOut: fadeLedOut,
-    motor:motor
   });
 });
 
