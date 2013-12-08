@@ -123,10 +123,13 @@ board.on("ready", function() {
     if (value && standardPing === 0) {
       standardPing = value;
     }
-      if (value) 
-      ledMax = 255 * (value - standardPingMin) / (standardPing - standardPingMin);
+    ledMax = 255 * (value - standardPingMin) / (standardPing - standardPingMin);
+
     if (ledMax > 255) ledMax = 255;
     if (ledMax < 0) ledMax = 0;
+    if (value) {
+      sendNote([144,12,ledMax]);
+    }
   });
 
   var baubles = [
@@ -148,7 +151,8 @@ board.on("ready", function() {
     fadeLedIn:fadeLedIn,
     ledMax: ledMax,
     fadeLedOut: fadeLedOut,
-    baubles:baubles
+    baubles:baubles,
+    output:output
   });
 });
 
