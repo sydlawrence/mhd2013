@@ -33,6 +33,25 @@ var LedStrip = function(pin) {
   return obj;
 };
 
+var Bauble = function(pin, note) {
+  var piezo = new five.Sensor(pin);
+  // var pot = new five.Sensor('A0');
+
+  // clever way to do this is only record an upwards curve
+  var isPlaying = false;
+  piezo.within([50,9000], function() {
+    if (isPlaying) return;
+
+    sendNote([144,note,44],3);
+    isPlaying = true;
+
+    setTimeout(function() {
+      sendNote([144,note,0], 3);
+      isPlaying = false;
+    }, 2000)
+    console.log('Bauble '+pin+' triggered ' + this.value);
+  });
+};
 
 // A midi device "Test Input" is now available for other
 // software to send messages to.
@@ -60,7 +79,6 @@ board.on("ready", function() {
   });
 
   var ping = new five.Ping(3);
-
 
   output = new midi.output();
   output.openVirtualPort("TechnoTree");
@@ -111,11 +129,26 @@ board.on("ready", function() {
     if (ledMax < 0) ledMax = 0;
   });
 
+  var baubles = [
+    new Bauble('A0', 47),
+    new Bauble('A1', 48),
+    new Bauble('A2', 49),
+    new Bauble('A3', 50),
+    new Bauble('A4', 51),
+    new Bauble('A5', 52),
+    new Bauble('A6', 53),
+    new Bauble('A7', 54),
+    new Bauble('A8', 55),
+    new Bauble('A9', 56),
+    new Bauble('A10', 57)
+  ];
+
   board.repl.inject({
     leds:leds,
     fadeLedIn:fadeLedIn,
     ledMax: ledMax,
     fadeLedOut: fadeLedOut,
+    baubles:baubles
   });
 });
 
