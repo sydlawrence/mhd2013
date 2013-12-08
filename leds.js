@@ -10,10 +10,14 @@ var mentalMode = false;
 
 var motor;
 
+var sendNote = function(message, deltaTime) {
+  console.log("sending "+message);
+}
 
 var goMental = function() {
   mentalMode = false;
   motor.start();
+  sendNote([ 144, 84, 100 ]);
 }
 
 var noMental = function() {
@@ -55,30 +59,19 @@ board.on("ready", function() {
   input = new midi.input();
   input.on('message', function(deltaTime, message) {
     console.log(message);
-    if (message[0] === 180 && message[1] === 1 ) {
-      setLed(2,message[2]);
+    setLed(2,message[2]);
 
-      if (mentalMode) {
-        try {
-          setLed(1,message[2]);
-          setLed(0,message[2]);
-          setLed(3,message[2]);
-        } catch (e) {}
-      }
+    if (mentalMode) {
+      try {
+        setLed(1,message[2]);
+        setLed(0,message[2]);
+        setLed(3,message[2]);
+      } catch (e) {}
     }
-    if (message[0] === 132 && message[1] === 48 && message[2] === 64 ) {
-      setLed(2,0);
-      if (mentalMode) {
-        try {
-          setLed(1,0);
-          setLed(0,0);
-          setLed(3,0);
-        } catch (e) {}
-      }
-    }
+   
   });
 
-  input.openVirtualPort("Test Input");
+  input.openVirtualPort("TechnoTree");
 
   leds = [
     new LedStrip(5),
@@ -90,10 +83,10 @@ board.on("ready", function() {
   // // Inject the `servo` hardware into
   // // the Repl instance's context;
   // // allows direct command line access
-  // fadeLedIn(0);
-  // delay(1000,fadeLedIn,1);
-  // delay(2000,fadeLedIn,2);
-  // delay(3000,fadeLedIn,3);
+  fadeLedIn(0);
+  delay(1000,fadeLedIn,1);
+  delay(2000,fadeLedIn,2);
+  delay(3000,fadeLedIn,3);
 
 
   var standardPing = 8000;
@@ -103,9 +96,8 @@ board.on("ready", function() {
     if (value && standardPing === 0) {
       standardPing = value;
     }
-    if (value) 
+      if (value) 
       ledMax = 255 * (value - standardPingMin) / (standardPing - standardPingMin);
-
     if (ledMax > 255) ledMax = 255;
     if (ledMax < 0) ledMax = 0;
   });
