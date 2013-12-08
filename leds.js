@@ -4,9 +4,22 @@ var five = require("johnny-five"),
     board, button, leds, input;
 
 
-var ledMax = 255;
+var ledMax = 10;
+
+var mentalMode = false;
+
+var motor;
 
 
+var goMental = function() {
+  mentalMode = false;
+  motor.start();
+}
+
+var noMental = function() {
+  mentalMode = false;
+  motor.stop();
+}
 
 var LedStrip = function(pin) {
   var obj = new five.Led({
@@ -34,15 +47,34 @@ var delay = function(duration, cb, args) {
 
 board.on("ready", function() {
 
+  var ping = new five.Ping(3);
+
+  motor = new five.Led(11);
+
 
   input = new midi.input();
   input.on('message', function(deltaTime, message) {
     console.log(message);
     if (message[0] === 180 && message[1] === 1 ) {
-      setLed(0,message[2]);
+      setLed(2,message[2]);
+
+      if (mentalMode) {
+        try {
+          setLed(1,message[2]);
+          setLed(0,message[2]);
+          setLed(3,message[2]);
+        } catch (e) {}
+      }
     }
     if (message[0] === 132 && message[1] === 48 && message[2] === 64 ) {
-      setLed(0,0);
+      setLed(2,0);
+      if (mentalMode) {
+        try {
+          setLed(1,0);
+          setLed(0,0);
+          setLed(3,0);
+        } catch (e) {}
+      }
     }
   });
 
@@ -50,9 +82,9 @@ board.on("ready", function() {
 
   leds = [
     new LedStrip(5),
-    new LedStrip(9),
-    new LedStrip(10),
-    new LedStrip(11)
+    new LedStrip(6),
+    new LedStrip(7),
+    new LedStrip(8)
   ];
 
   // // Inject the `servo` hardware into
@@ -62,13 +94,28 @@ board.on("ready", function() {
   // delay(1000,fadeLedIn,1);
   // delay(2000,fadeLedIn,2);
   // delay(3000,fadeLedIn,3);
+
+
+  var standardPing = 8000;
+  var standardPingMin = 300;
  
+  ping.on("data", function(err, value) {
+    if (value && standardPing === 0) {
+      standardPing = value;
+    }
+    if (value) 
+      ledMax = 255 * (value - standardPingMin) / (standardPing - standardPingMin);
+
+    if (ledMax > 255) ledMax = 255;
+    if (ledMax < 0) ledMax = 0;
+  });
 
   board.repl.inject({
     leds:leds,
     fadeLedIn:fadeLedIn,
     ledMax: ledMax,
-    fadeLedOut: fadeLedOut
+    fadeLedOut: fadeLedOut,
+    motor:motor
   });
 });
 
